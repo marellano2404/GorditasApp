@@ -1,0 +1,20 @@
+{
+    "name": "Control de Ventas - Gorditas y Tacos",
+    "short_name": "Gorditas",
+    "start_url": "./",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#b8860b",
+    "icons": [
+        {
+            "src": "icon-192/icon.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "icon-512/icon.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ]
+}

@@ -1,0 +1,367 @@
+@page "/"
+@inject PedidoViewModel Vm
+@inject IJSRuntime JS
+
+<h1 class="mb-1">Pedido del día</h1>
+<p class="text-muted mb-3 no-print">
+    📱 Has abierto esta app @visitasUsuario @(visitasUsuario == 1 ? "vez" : "veces") en este dispositivo
+</p>
+
+<!-- ===================== PRECIOS ===================== -->
+<div class="card mb-4 no-print">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>
+            💲 <strong>Gordita:</strong> $@Vm.Precios.PrecioGordita.ToString("0.00") &nbsp;|&nbsp;
+            <strong>Taco:</strong> $@Vm.Precios.PrecioTaco.ToString("0.00") &nbsp;|&nbsp;
+            <strong>Refresco (total):</strong> $@Vm.Precios.CostoRefrescoTotal.ToString("0.00") &nbsp;|&nbsp;
+            <strong>Envío (total):</strong> $@Vm.Precios.CostoEnvioTotal.ToString("0.00")
+        </span>
+        <button class="btn btn-sm btn-outline-primary" @onclick="() => mostrarFormularioPrecios = !mostrarFormularioPrecios">
+            @(mostrarFormularioPrecios ? "Ocultar" : "✏️ Editar precios")
+        </button>
+    </div>
+    @if (mostrarFormularioPrecios)
+    {
+        <div class="card-body row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Precio Gordita</label>
+                <input type="number" step="0.5" class="form-control" @bind="precioGordita" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Precio Taco</label>
+                <input type="number" step="0.5" class="form-control" @bind="precioTaco" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Costo total del refresco (a repartir)</label>
+                <input type="number" step="0.5" class="form-control" @bind="costoRefresco" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Costo total del envío (a repartir)</label>
+                <input type="number" step="0.5" class="form-control" @bind="costoEnvio" />
+            </div>
+            <div class="col-12">
+                <button class="btn btn-primary" @onclick="GuardarPrecios">Guardar precios</button>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- ===================== AGREGAR PERSONA ===================== -->
+<div class="card mb-4 no-print">
+    <div class="card-header">Agregar persona</div>
+    <div class="card-body row g-3 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label">Nombre</label>
+            <input class="form-control" @bind="nuevoNombre" placeholder="Nombre" />
+        </div>
+        <div class="col-md-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" @bind="nuevoEsCumpleanero" id="chkCumple" />
+                <label class="form-check-label" for="chkCumple">Es cumpleañero 🎉</label>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-success w-100" @onclick="AgregarPersona" disabled="@string.IsNullOrWhiteSpace(nuevoNombre)">
+                + Agregar persona
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== LISTA DE PERSONAS Y SUS PEDIDOS ===================== -->
+@foreach (var persona in Vm.Personas)
+{
+    <div class="card mb-3 no-print">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>
+                <strong>@persona.Nombre</strong>
+                @if (persona.EsCumpleanero)
+                {
+                    <span class="badge bg-warning text-dark ms-2">🎂 Cumpleañero (no paga)</span>
+                }
+                @if (!EstaExpandida(persona.Id))
+                {
+                    @if (persona.Items.Count == 0)
+                    {
+                        <span class="badge bg-light text-muted border ms-2 fw-normal">sin pedido</span>
+                    }
+                    else
+                    {
+                        <span class="ms-2">
+                            @foreach (var item in persona.Items)
+                            {
+                                <span class="badge bg-light text-dark border me-1 fw-normal">@item.Descripcion</span>
+                            }
+                        </span>
+                    }
+                }
+            </span>
+            <span>
+                <button class="btn btn-sm btn-outline-secondary me-2" @onclick="() => ToggleExpandida(persona.Id)">
+                    @(EstaExpandida(persona.Id) ? "▲ Cerrar" : "✏️ Editar pedido")
+                </button>
+                <button class="btn btn-sm btn-outline-danger" @onclick="() => EliminarPersona(persona.Id)">Quitar</button>
+            </span>
+        </div>
+        @if (EstaExpandida(persona.Id))
+        {
+        <div class="card-body">
+
+            <!-- Cooperaciones: chips compactos en una sola línea -->
+            <div class="chip-row mb-3">
+                @if (!persona.EsCumpleanero)
+                {
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" checked="@persona.CooperaCumpleanero"
+                               @onchange="e => persona.CooperaCumpleanero = (bool)e.Value!"
+                               id="@($"chkCumple_{persona.Id}")" />
+                        <label class="form-check-label" for="@($"chkCumple_{persona.Id}")">🎂 Cumpleañero</label>
+                    </div>
+                }
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" checked="@persona.CooperaRefresco"
+                           @onchange="e => persona.CooperaRefresco = (bool)e.Value!"
+                           id="@($"chkRefresco_{persona.Id}")" />
+                    <label class="form-check-label" for="@($"chkRefresco_{persona.Id}")">🥤 Refresco</label>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" checked="@persona.CooperaEnvio"
+                           @onchange="e => persona.CooperaEnvio = (bool)e.Value!"
+                           id="@($"chkEnvio_{persona.Id}")" />
+                    <label class="form-check-label" for="@($"chkEnvio_{persona.Id}")">🛵 Envío</label>
+                </div>
+            </div>
+
+            <!-- Agregar item: fila compacta -->
+            <div class="chip-add-row mb-3">
+                <select class="form-select form-select-sm" @bind="itemTipo[persona.Id]">
+                    <option value="Gordita">Gordita</option>
+                    <option value="Taco">Taco</option>
+                </select>
+                <select class="form-select form-select-sm" @bind="itemRelleno[persona.Id]">
+                    <option value="Maciza">Maciza</option>
+                    <option value="Surtida">Surtida</option>
+                    <option value="Chicharron">Chicharron</option>
+                    <option value="Barbacoa">Barbacoa</option>
+                    <option value="Costilla">Costilla</option>
+                </select>
+                <input type="number" min="1" class="form-control form-control-sm" style="width:60px" @bind="itemCantidad[persona.Id]" />
+                <button class="btn btn-sm btn-outline-primary" @onclick="() => AgregarItem(persona.Id)">+ Agregar</button>
+            </div>
+
+            <!-- Items actuales: chips removibles -->
+            @if (persona.Items.Count == 0)
+            {
+                <p class="text-muted mb-0"><em>Sin pedido aún — puede quedarse solo cooperando (cumpleañero/refresco/envío)</em></p>
+            }
+            else
+            {
+                <div class="chip-row">
+                    @foreach (var item in persona.Items)
+                    {
+                        <span class="chip">
+                            @item.Descripcion
+                            <button type="button" class="chip-remove" @onclick="() => EliminarItem(persona.Id, item.Id)" aria-label="Quitar">✕</button>
+                        </span>
+                    }
+                </div>
+            }
+        </div>
+        }
+    </div>
+}
+
+<!-- ===================== CALCULAR ===================== -->
+<div class="mb-4 no-print">
+    <button class="btn btn-lg btn-dark" @onclick="Calcular" disabled="@(Vm.Personas.Count == 0)">
+        🧮 Calcular cuenta
+    </button>
+</div>
+
+@if (Vm.Resultados.Count > 0)
+{
+    <div class="mb-2 no-print">
+        <button class="btn btn-outline-primary" @onclick="Imprimir">🖨️ Imprimir / Guardar como PDF</button>
+        <button class="btn btn-outline-primary" @onclick="DescargarCsv">⬇️ Descargar CSV</button>
+    </div>
+
+    <div class="card mb-4" id="reporte-imprimible">
+        <div class="card-header">Resultado de la cuenta</div>
+        <div class="card-body table-responsive">
+            <p class="text-muted mb-3 solo-print">Generado el @fechaCalculo.ToString("dd/MM/yyyy HH:mm")</p>
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Persona</th>
+                        <th>Pedido</th>
+                        <th class="text-end">Costo pedido</th>
+                        <th class="text-end">Paga su pedido</th>
+                        <th class="text-end">Aporte cumpleañero</th>
+                        <th class="text-end">Aporte refresco</th>
+                        <th class="text-end">Aporte envío</th>
+                        <th class="text-end">Total a pagar</th>
+                        <th class="text-end">Pagó con</th>
+                        <th class="text-end">Cambio / Debe</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Vm.Resultados)
+                    {
+                        <tr class="@(r.EsCumpleanero ? "table-warning" : "")">
+                            <td>@r.Nombre @(r.EsCumpleanero ? "🎂" : "")</td>
+                            <td>@r.DetallePedido</td>
+                            <td class="text-end">$@r.CostoPedido.ToString("0.00")</td>
+                            <td class="text-end">$@r.PagaPorSuPedido.ToString("0.00")</td>
+                            <td class="text-end">$@r.AportacionCumpleanero.ToString("0.00")</td>
+                            <td class="text-end">$@r.AportacionRefresco.ToString("0.00")</td>
+                            <td class="text-end">$@r.AportacionEnvio.ToString("0.00")</td>
+                            <td class="text-end"><strong>$@r.TotalAPagar.ToString("0.00")</strong></td>
+                            <td class="text-end">
+                                <input type="number" step="0.5" min="0"
+                                       class="form-control form-control-sm text-end no-print d-inline-block"
+                                       style="max-width:100px"
+                                       value="@r.MontoPagado"
+                                       @onchange="e => Vm.ActualizarMontoPagado(r.PersonaId, ParseDecimal(e.Value))" />
+                                <span class="solo-print">$@r.MontoPagado.ToString("0.00")</span>
+                            </td>
+                            <td class="text-end">
+                                @if (r.MontoPagado <= 0)
+                                {
+                                    <span class="text-muted">—</span>
+                                }
+                                else if (r.Cambio >= 0)
+                                {
+                                    <span class="text-success">$@r.Cambio.ToString("0.00")</span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger">Debe $@Math.Abs(r.Cambio).ToString("0.00")</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p class="mb-0">
+                <strong>Total recaudado:</strong> $@Vm.TotalRecaudado.ToString("0.00") &nbsp;|&nbsp;
+                <strong>Gasto real (comida + refresco + envío):</strong> $@Vm.GastoReal.ToString("0.00")
+                @if (Vm.TotalRecaudado != Vm.GastoReal)
+                {
+                    <span class="text-danger"> ⚠ No coinciden (revisa si hay 0 cooperantes en algún reparto)</span>
+                }
+            </p>
+        </div>
+    </div>
+}
+
+@code {
+    private decimal precioGordita = 15m;
+    private decimal precioTaco = 15m;
+    private decimal costoRefresco = 0m;
+    private decimal costoEnvio = 0m;
+    private bool mostrarFormularioPrecios = true;
+
+    private string nuevoNombre = string.Empty;
+    private bool nuevoEsCumpleanero = false;
+    private DateTime fechaCalculo = DateTime.Now;
+
+    // Estado temporal por persona para el formulario de "agregar item"
+    private Dictionary<Guid, string> itemTipo = new();
+    private Dictionary<Guid, string> itemRelleno = new();
+    private Dictionary<Guid, int> itemCantidad = new();
+
+    // Controla si la tarjeta de una persona está expandida (mostrando el detalle/formulario)
+    // o colapsada (mostrando solo un resumen en una línea).
+    private Dictionary<Guid, bool> personaExpandida = new();
+    private bool EstaExpandida(Guid personaId) => personaExpandida.GetValueOrDefault(personaId, false);
+    private void ToggleExpandida(Guid personaId) => personaExpandida[personaId] = !EstaExpandida(personaId);
+
+    // Número de veces que se ha abierto la app en este dispositivo (ver nota en app.js:
+    // no hay login/base de datos, así que es por navegador, no por "usuario" real).
+    private int visitasUsuario;
+
+    protected override void OnInitialized()
+    {
+        precioGordita = Vm.Precios.PrecioGordita;
+        precioTaco = Vm.Precios.PrecioTaco;
+        costoRefresco = Vm.Precios.CostoRefrescoTotal;
+        costoEnvio = Vm.Precios.CostoEnvioTotal;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            visitasUsuario = await JS.InvokeAsync<int>("gorditasApp.contarVisita");
+            StateHasChanged();
+        }
+    }
+
+    private void GuardarPrecios()
+    {
+        Vm.ActualizarPrecios(precioGordita, precioTaco, costoRefresco, costoEnvio);
+        mostrarFormularioPrecios = false;
+    }
+
+    private void AgregarPersona()
+    {
+        var persona = Vm.AgregarPersona(nuevoNombre.Trim(), nuevoEsCumpleanero);
+        itemTipo[persona.Id] = "Gordita";
+        itemRelleno[persona.Id] = "Maciza";
+        itemCantidad[persona.Id] = 1;
+        personaExpandida[persona.Id] = true; // recién agregada: se abre lista para capturar su pedido
+
+        nuevoNombre = string.Empty;
+        nuevoEsCumpleanero = false;
+    }
+
+    private void EliminarPersona(Guid id)
+    {
+        Vm.EliminarPersona(id);
+        itemTipo.Remove(id);
+        itemRelleno.Remove(id);
+        itemCantidad.Remove(id);
+        personaExpandida.Remove(id);
+    }
+
+    private void AgregarItem(Guid personaId)
+    {
+        var tipo = Enum.Parse<TipoAlimento>(itemTipo.GetValueOrDefault(personaId, "Gordita"));
+        var relleno = Enum.Parse<TipoRelleno>(itemRelleno.GetValueOrDefault(personaId, "Maciza"));
+        var cantidad = itemCantidad.GetValueOrDefault(personaId, 1);
+
+        Vm.AgregarItem(personaId, tipo, relleno, cantidad);
+    }
+
+    private void EliminarItem(Guid personaId, Guid itemId) => Vm.EliminarItem(personaId, itemId);
+
+    private void Calcular()
+    {
+        Vm.Calcular();
+        fechaCalculo = DateTime.Now;
+    }
+
+    private static decimal ParseDecimal(object? value) =>
+        decimal.TryParse(value?.ToString(), out var d) ? d : 0m;
+
+    private async Task Imprimir() => await JS.InvokeVoidAsync("gorditasApp.imprimir");
+
+    private async Task DescargarCsv()
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("Persona,Pedido,Costo pedido,Paga su pedido,Aporte cumpleañero,Aporte refresco,Aporte envío,Total a pagar,Pagó con,Cambio/Debe");
+
+        foreach (var r in Vm.Resultados)
+        {
+            // Se envuelve en comillas el pedido por si tiene comas dentro de la descripción.
+            sb.AppendLine($"{r.Nombre},\"{r.DetallePedido}\",{r.CostoPedido:0.00},{r.PagaPorSuPedido:0.00},{r.AportacionCumpleanero:0.00},{r.AportacionRefresco:0.00},{r.AportacionEnvio:0.00},{r.TotalAPagar:0.00},{r.MontoPagado:0.00},{r.Cambio:0.00}");
+        }
+
+        sb.AppendLine();
+        sb.AppendLine($"Total recaudado,,,,,,,{Vm.TotalRecaudado:0.00}");
+        sb.AppendLine($"Gasto real,,,,,,,{Vm.GastoReal:0.00}");
+
+        var nombreArchivo = $"cuenta_gorditas_{fechaCalculo:yyyyMMdd_HHmm}.csv";
+        await JS.InvokeVoidAsync("gorditasApp.descargarCsv", nombreArchivo, sb.ToString());
+    }
+}

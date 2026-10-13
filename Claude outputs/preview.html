@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preview diseño</title>
+<style>
+:root {
+    --brand: #b8860b;
+    --brand-dark: #8a640a;
+    --border: #dee2e6;
+    --muted: #6c757d;
+    --bg-warning: #fff3cd;
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: #f7f5f2;
+    color: #212529;
+    padding: 24px;
+}
+.content { max-width: 560px; margin: 0 auto; }
+h2 { font-size: 1rem; color: var(--muted); margin: 0 0 8px; }
+.card { background: #fff; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 1.5rem; overflow: hidden; }
+.card-header { background: #f1eee8; padding: 10px 16px; font-weight: 600; border-bottom: 1px solid var(--border); }
+.card-body { padding: 16px; }
+.row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; }
+.g-2 > * { margin: 0.15rem; }
+.g-3 > * { margin: 0.35rem; }
+.align-items-center { align-items: center; }
+label.form-label { display: block; font-size: 0.85rem; margin-bottom: 4px; color: #444; }
+.form-control, .form-select {
+    padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem;
+}
+.form-select-sm, .form-control-sm { padding: 5px 8px; font-size: 0.85rem; }
+.form-check { display: flex; align-items: center; gap: 6px; }
+.form-check-input { width: 18px; height: 18px; }
+.form-switch .form-check-input { cursor: pointer; }
+.form-check-label { font-size: 0.9rem; white-space: nowrap; }
+.btn { border: none; border-radius: 6px; padding: 8px 16px; font-size: 0.95rem; cursor: pointer; }
+.btn-sm { padding: 5px 12px; font-size: 0.85rem; }
+.btn-outline-primary { background: transparent; border: 1px solid var(--brand); color: var(--brand); }
+
+/* ---- Nuevo: clases que faltaban en app.css ---- */
+.chip-row { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; align-items: center; }
+.chip-add-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #f1eee8; border: 1px solid var(--border); border-radius: 999px;
+    padding: 5px 6px 5px 12px; font-size: 0.85rem; font-weight: 400;
+}
+.chip-remove {
+    background: #e2ddd4; border: none; border-radius: 50%;
+    width: 18px; height: 18px; line-height: 1; font-size: 0.75rem;
+    cursor: pointer; color: #555;
+}
+.chip-remove:hover { background: #d8d2c6; color: #c0392b; }
+.text-muted { color: var(--muted); font-size: 0.85rem; }
+hr.sep { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+</style>
+</head>
+<body>
+<div class="content">
+
+    <h2>Opción actual (lo que no te gustó)</h2>
+    <div class="card">
+        <div class="card-body">
+            <div style="display:block">
+                <div class="form-check form-switch" style="margin-bottom:6px"><input class="form-check-input" type="checkbox" checked><label class="form-check-label">🎂 Cumpleañero</label></div>
+                <div class="form-check form-switch" style="margin-bottom:6px"><input class="form-check-input" type="checkbox" checked><label class="form-check-label">🥤 Refresco</label></div>
+                <div class="form-check form-switch" style="margin-bottom:6px"><input class="form-check-input" type="checkbox" checked><label class="form-check-label">🛵 Envío</label></div>
+            </div>
+            <hr class="sep">
+            <div style="display:block">
+                <select class="form-select" style="margin-bottom:6px; width:100%"><option>Gordita</option></select>
+                <select class="form-select" style="margin-bottom:6px; width:100%"><option>Maciza</option></select>
+                <input class="form-control" style="margin-bottom:6px; width:100%" value="2">
+                <button class="btn" style="background:#fff;border:1px solid var(--brand);color:var(--brand);width:100%">+ Agregar</button>
+            </div>
+        </div>
+    </div>
+
+    <h2>Propuesta: cuadrícula horizontal</h2>
+    <div class="card">
+        <div class="card-body">
+            <div class="chip-row" style="margin-bottom:14px">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" checked>
+                    <label class="form-check-label">🎂 Cumpleañero</label>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" checked>
+                    <label class="form-check-label">🥤 Refresco</label>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" checked>
+                    <label class="form-check-label">🛵 Envío</label>
+                </div>
+            </div>
+
+            <div class="chip-add-row" style="margin-bottom:14px">
+                <select class="form-select form-select-sm">
+                    <option>Gordita</option>
+                    <option>Taco</option>
+                </select>
+                <select class="form-select form-select-sm">
+                    <option>Maciza</option>
+                    <option>Surtida</option>
+                    <option>Chicharron</option>
+                    <option>Barbacoa</option>
+                    <option>Costilla</option>
+                </select>
+                <input class="form-control form-control-sm" style="width:60px" value="2">
+                <button class="btn btn-sm btn-outline-primary">+ Agregar</button>
+            </div>
+
+            <div class="chip-row">
+                <span class="chip">2 Gordita(s) de Maciza <button class="chip-remove">✕</button></span>
+                <span class="chip">1 Taco(s) de Costilla <button class="chip-remove">✕</button></span>
+            </div>
+        </div>
+    </div>
+
+    <p class="text-muted">Mismos colores y fuente de tu app — solo cambia cómo se acomodan los controles. Los checkboxes y la fila de "agregar" quedan en una sola línea que se ajusta sola según el ancho de pantalla, y cada artículo del pedido se ve como una etiqueta con su botón de quitar (✕).</p>
+</div>
+</body>
+</html>

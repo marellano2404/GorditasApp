@@ -1,0 +1,161 @@
+:root {
+    --brand: #b8860b;
+    --brand-dark: #8a640a;
+    --border: #dee2e6;
+    --muted: #6c757d;
+    --bg-warning: #fff3cd;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: #f7f5f2;
+    color: #212529;
+}
+
+.top-bar {
+    background: var(--brand);
+    color: white;
+    padding: 14px 20px;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.content { max-width: 1100px; margin: 0 auto; padding-top: 20px; padding-bottom: 60px; }
+.px-3 { padding-left: 1rem; padding-right: 1rem; }
+
+h1 { font-size: 1.6rem; margin: 0 0 1rem 0; }
+
+/* Cards */
+.card { background: #fff; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 1rem; overflow: hidden; }
+.card-header { background: #f1eee8; padding: 10px 16px; font-weight: 600; border-bottom: 1px solid var(--border); display: flex; }
+.card-header.d-flex { justify-content: space-between; align-items: center; }
+.card-body { padding: 16px; }
+
+/* Grid */
+.row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; }
+.g-2 > * { margin: 0.15rem; }
+.g-3 > * { margin: 0.35rem; }
+[class*="col-"] { flex: 1 1 200px; min-width: 140px; }
+.col-12 { flex: 1 1 100%; }
+.align-items-end { align-items: flex-end; }
+.align-items-center { align-items: center; }
+.justify-content-between { justify-content: space-between; }
+
+/* Forms */
+label.form-label { display: block; font-size: 0.85rem; margin-bottom: 4px; color: #444; }
+.form-control, .form-select {
+    width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem;
+}
+.form-select-sm, .form-control-sm { width: auto; padding: 5px 8px; font-size: 0.85rem; }
+.form-check { display: flex; align-items: center; gap: 6px; }
+.form-check-input { width: 18px; height: 18px; }
+.form-switch .form-check-input { cursor: pointer; }
+.form-check-label { font-size: 0.9rem; }
+
+/* Buttons */
+.btn { border: none; border-radius: 6px; padding: 8px 16px; font-size: 0.95rem; cursor: pointer; transition: opacity .15s; }
+.btn:hover { opacity: 0.9; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: var(--brand); color: #fff; }
+.btn-success { background: #2e7d32; color: #fff; }
+.btn-dark { background: #222; color: #fff; }
+.btn-outline-primary { background: transparent; border: 1px solid var(--brand); color: var(--brand); }
+.btn-outline-danger { background: transparent; border: 1px solid #c0392b; color: #c0392b; }
+.btn-link { background: none; text-decoration: underline; padding: 0; }
+.btn-sm { padding: 4px 10px; font-size: 0.85rem; }
+.btn-lg { padding: 12px 22px; font-size: 1.1rem; }
+.w-100 { width: 100%; }
+
+/* Badges */
+.badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+.bg-warning { background: #ffc107; }
+.text-dark { color: #212529 !important; }
+
+/* Table */
+.table-responsive { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+.table-striped tbody tr:nth-child(odd) { background: #faf9f7; }
+.table-warning { background: var(--bg-warning) !important; }
+.text-end { text-align: right; }
+
+/* Lists */
+.list-group { list-style: none; margin: 0; padding: 0; border: 1px solid var(--border); border-radius: 6px; }
+.list-group-item { padding: 8px 12px; border-bottom: 1px solid var(--border); display: flex; }
+.list-group-item:last-child { border-bottom: none; }
+
+/* Chips: cooperaciones y artículos del pedido en cuadrícula horizontal */
+.chip-row { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; align-items: center; }
+.chip-add-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #f1eee8; border: 1px solid var(--border); border-radius: 999px;
+    padding: 5px 6px 5px 12px; font-size: 0.85rem; font-weight: 400;
+}
+.chip-remove {
+    background: #e2ddd4; border: none; border-radius: 50%;
+    width: 18px; height: 18px; line-height: 1; font-size: 0.75rem;
+    cursor: pointer; color: #555; padding: 0;
+}
+.chip-remove:hover { background: #d8d2c6; color: #c0392b; }
+
+/* Utility spacing */
+.mb-0 { margin-bottom: 0; } .mb-2 { margin-bottom: 0.5rem; } .mb-3 { margin-bottom: 1rem; } .mb-4 { margin-bottom: 1.5rem; }
+.mt-2 { margin-top: 0.5rem; } .ms-2 { margin-left: 0.5rem; }
+.text-muted { color: var(--muted); }
+.text-danger { color: #c0392b; }
+
+/* El texto "Generado el ..." solo se muestra al imprimir, no en pantalla */
+.solo-print { display: none; }
+
+/* ===================== IMPRESIÓN / PDF ===================== */
+@page {
+    /* Con tantas columnas en la tabla, en horizontal cabe mejor en una sola hoja */
+    size: landscape;
+    margin: 10mm;
+}
+
+@media print {
+    .no-print { display: none !important; }
+    .solo-print { display: block !important; }
+
+    .top-bar { display: none !important; }
+    body { background: #fff; font-size: 11px; }
+    .content { max-width: 100%; padding: 0; }
+
+    #reporte-imprimible {
+        border: none;
+        box-shadow: none;
+    }
+    #reporte-imprimible .card-header {
+        background: #fff;
+        border-bottom: 2px solid #000;
+        font-size: 1.1rem;
+        padding: 0 0 6px 0;
+    }
+    #reporte-imprimible p {
+        font-size: 0.75rem;
+    }
+    #reporte-imprimible .table {
+        font-size: 0.72rem;
+    }
+    #reporte-imprimible .table th,
+    #reporte-imprimible .table td {
+        border: 1px solid #999;
+        padding: 3px 5px;
+    }
+    #reporte-imprimible .table-striped tbody tr:nth-child(odd) { background: #f2f2f2 !important; }
+    #reporte-imprimible .table-warning { background: #fdf1cf !important; }
+}
+
+/* Loading / error UI */
+.loading-splash { padding: 40px; text-align: center; color: var(--muted); font-size: 1.1rem; }
+
+#blazor-error-ui {
+    background: #fff3cd; bottom: 0; box-shadow: 0 -1px 8px rgba(0,0,0,.2);
+    display: none; left: 0; padding: 0.8rem 1.2rem; position: fixed; width: 100%; z-index: 1000;
+}
+#blazor-error-ui .dismiss { cursor: pointer; position: absolute; right: 0.75rem; top: 0.5rem; }
