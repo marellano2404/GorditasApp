@@ -1,4 +1,4 @@
-# Control de Ventas — Gorditas & Tacos
+# Controlando la cooperacha — Gorditas & Tacos
 
 App web (Blazor WebAssembly, .NET 9) para calcular la cuenta de un pedido grupal de
 gorditas/tacos, incluyendo la regla del cumpleañero que no paga.
